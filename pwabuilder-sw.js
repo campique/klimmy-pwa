@@ -1,8 +1,8 @@
 const CACHE_NAME = 'my-cache-v1';
 const urlsToCache = [
   '/',
-  '/d5595c66-85ed-46ca-9a20-7e4988fb0618',
-  'https://fcdn.answerly.io/477718fd-e50b-4758-8fcb-7709dedf75ec/8c825ef9-d96d-49af-ba9a-951c761f104d.png' // Voeg andere benodigde bestanden toe
+  '/d585feef-ad87-4e8a-b0e4-f0ecea5db2f9',
+  'https://fcdn.answerly.io/477718fd-e50b-4758-8fcb-7709dedf75ec/29cfa402-2d4f-4a02-85f2-3e02f9242326.png' // Voeg andere benodigde bestanden toe
 ];
 
 // Installatie van de service worker
