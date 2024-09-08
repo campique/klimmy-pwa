@@ -41,3 +41,6 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
+// OneSignal Service Worker import
+importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');
