@@ -1,5 +1,5 @@
 {
-  "name": "Klimmy the Cheerfull Butterfly",
+  "name": "Klimmy the Cheerful Butterfly",
   "short_name": "Klimmy",
   "start_url": "/d585feef-ad87-4e8a-b0e4-f0ecea5db2f9",
   "scope": "/",
@@ -11,8 +11,11 @@
       "src": "https://fcdn.answerly.io/477718fd-e50b-4758-8fcb-7709dedf75ec/29cfa402-2d4f-4a02-85f2-3e02f9242326.png",
       "sizes": "192x192",
       "type": "image/png"
+    },
+    {
+      "src": "https://fcdn.answerly.io/477718fd-e50b-4758-8fcb-7709dedf75ec/29cfa402-2d4f-4a02-85f2-3e02f9242326.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ],
-  "gcm_sender_id": "482941778795",
-  "gcm_user_visible_only": true
+  ]
 }
