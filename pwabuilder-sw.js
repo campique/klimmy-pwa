@@ -1,46 +1,83 @@
-const CACHE_NAME = 'my-cache-v1';
-const urlsToCache = [
-  '/',
-  '/d585feef-ad87-4e8a-b0e4-f0ecea5db2f9',
-  'https://fcdn.answerly.io/477718fd-e50b-4758-8fcb-7709dedf75ec/29cfa402-2d4f-4a02-85f2-3e02f9242326.png' // Voeg andere benodigde bestanden toe
+// This is the service worker with the Cache-first network
+
+const CACHE = "pwabuilder-precache";
+const precacheFiles = [
+  /* Add an array of files to precache for your app */
 ];
 
-// Installatie van de service worker
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
+self.addEventListener("install", function (event) {
+  console.log("[PWA Builder] Install Event processing");
 
-// Activeren van de service worker
-self.addEventListener('activate', (event) => {
+  console.log("[PWA Builder] Skip waiting on install");
+  self.skipWaiting();
+
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
+    caches.open(CACHE).then(function (cache) {
+      console.log("[PWA Builder] Caching pages during install");
+      return cache.addAll(precacheFiles);
     })
   );
 });
 
-// Fetchen van de netwerkverzoeken
-self.addEventListener('fetch', (event) => {
+// Allow sw to control of current page
+self.addEventListener("activate", function (event) {
+  console.log("[PWA Builder] Claiming clients for current page");
+  event.waitUntil(self.clients.claim());
+});
+
+// If any fetch fails, it will look for the request in the cache and serve it from there first
+self.addEventListener("fetch", function (event) { 
+  if (event.request.method !== "GET") return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        return response || fetch(event.request);
-      })
+    fromCache(event.request).then(
+      function (response) {
+        // The response was found in the cache so we responde with it and update the entry
+
+        // This is where we call the server to get the newest version of the
+        // file to use the next time we show view
+        event.waitUntil(
+          fetch(event.request).then(function (response) {
+            return updateCache(event.request, response);
+          })
+        );
+
+        return response;
+      },
+      function () {
+        // The response was not found in the cache so we look for it on the server
+        return fetch(event.request)
+          .then(function (response) {
+            // If request was success, add or update it in the cache
+            event.waitUntil(updateCache(event.request, response.clone()));
+
+            return response;
+          })
+          .catch(function (error) {
+            console.log("[PWA Builder] Network request failed and no cache." + error);
+          });
+      }
+    )
   );
 });
 
-// OneSignal Service Worker import
-importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');
+function fromCache(request) {
+  // Check to see if you have it in the cache
+  // Return response
+  // If not in the cache, then return
+  return caches.open(CACHE).then(function (cache) {
+    return cache.match(request).then(function (matching) {
+      if (!matching || matching.status === 404) {
+        return Promise.reject("no-match");
+      }
+
+      return matching;
+    });
+  });
+}
+
+function updateCache(request, response) {
+  return caches.open(CACHE).then(function (cache) {
+    return cache.put(request, response);
+  });
+}
